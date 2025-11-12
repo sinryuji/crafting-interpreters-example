@@ -77,9 +77,27 @@ public class Scanner {
                 addToken(match('=') ? GREATER_EQUAL : GREATER);
                 break;
             case '/':
-                if (match('/')) {
+                if (match('*'))  {
+                    int comment = 1;
+                    while (comment > 0) {
+                        if (isAtEnd()) {
+                            Lox.error(line, "Unexpected block comment");
+                            break;
+                        }
+                        if (peek() == '/' && peekNext() == '*') {
+                            comment++;
+                            advance();
+                        }
+                        if (peek() == '*' && peekNext() == '/') {
+                            comment--;
+                            advance();
+                        }
+                        advance();
+                    }
+                }
+                else if (match('/')) {
                     // 주석은 줄 끝까지 이어진다
-                    while(peek() != '\n' && !isAtEnd()) advance();
+                    while (peek() != '\n' && !isAtEnd()) advance();
                 } else {
                     addToken(SLASH);
                 }
