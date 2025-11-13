@@ -31,3 +31,8 @@ tasks.register('generateAst', JavaExec) {
     mainClass = 'tool.GenerateAst'
     args("./src/main/java/lox")
 }
+
+tasks.register('astPrinter', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'lox.AstPrinter'
+}
