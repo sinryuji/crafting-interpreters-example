@@ -45,3 +45,4 @@ bin/
 
 *.class
 a.out
+*.lox
