@@ -25,3 +25,9 @@ jar {
         )
     }
 }
+
+tasks.register('generateAst', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'tool.GenerateAst'
+    args("./src/main/java/lox")
+}
