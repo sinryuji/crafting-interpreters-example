@@ -36,3 +36,8 @@ tasks.register('astPrinter', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'lox.AstPrinter'
 }
+
+tasks.register('rpnPrinter', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'lox.RpnPrinter'
+}

@@ -1,6 +1,7 @@
 package lox;
 
 class AstPrinter implements Expr.Visitor<String> {
+
     String print(Expr expr) {
         return expr.accept(this);
     }
@@ -17,7 +18,9 @@ class AstPrinter implements Expr.Visitor<String> {
 
     @Override
     public String visitLiteralExpr(Expr.Literal expr) {
-        if (expr.value == null) return "nil";
+        if (expr.value == null) {
+            return "nil";
+        }
         return expr.value.toString();
     }
 
