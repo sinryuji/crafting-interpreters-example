@@ -21,15 +21,64 @@ test {
 jar {
     manifest {
         attributes(
-            'Main-Class': 'lox.Lox'
+                'Main-Class': 'lox.Lox'
         )
     }
 }
 
+sourceSets {
+    tool {
+        java {
+            srcDir 'src/main/java/tool'
+        }
+    }
+}
+
+tasks.register('compileTool', JavaCompile) {
+    source = sourceSets.tool.java
+    classpath = sourceSets.tool.compileClasspath
+    destinationDirectory.set(layout.buildDirectory.dir("classes/tool"))
+}
+
 tasks.register('generateAst', JavaExec) {
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'tool.GenerateAst'
+    dependsOn tasks.named('compileTool')
+
+    classpath = files(
+            layout.buildDirectory.dir("classes/tool"),
+            sourceSets.tool.runtimeClasspath
+    )
+
+    mainClass.set("tool.GenerateAst")
     args("./src/main/java/lox")
+}
+
+// 1) javac로 단일 파일만 컴파일
+tasks.register('compileAstStandalone', Exec) {
+    def outDir = layout.buildDirectory.dir("ast").get().asFile
+    doFirst {
+        outDir.mkdirs()
+    }
+
+    commandLine 'javac',
+            'src/main/java/tool/GenerateAst.java',
+            '-d', outDir
+}
+
+// 2) java로 실행
+tasks.register('runAstStandalone', Exec) {
+    dependsOn 'compileAstStandalone'
+
+    def outDir = layout.buildDirectory.dir("ast").get().asFile
+
+    commandLine 'java',
+            '-cp', outDir,
+            'tool.GenerateAst',
+            './src/main/java/lox'
+}
+
+// 3) 편하게 쓰기 위한 wrapper task
+tasks.register('generateAstStandalone') {
+    dependsOn 'runAstStandalone'
 }
 
 tasks.register('astPrinter', JavaExec) {
