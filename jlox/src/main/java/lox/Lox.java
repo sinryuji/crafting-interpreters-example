@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Lox {
+
     static boolean hadError = false;
 
     public static void main(String[] args) throws IOException {
@@ -27,17 +28,21 @@ public class Lox {
         run(new String(bytes, Charset.defaultCharset()));
 
         // 종료 코드로 에러를 식별한다
-        if (hadError) System.exit(65);
+        if (hadError) {
+            System.exit(65);
+        }
     }
 
     private static void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
-        for (;;) {
+        for (; ; ) {
             System.out.print("〉 ");
             String line = reader.readLine();
-            if (line == null) break;
+            if (line == null) {
+                break;
+            }
             run(line);
             hadError = false;
         }
@@ -46,11 +51,15 @@ public class Lox {
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
+        Parser parser = new Parser(tokens);
+        Expr expression = parser.parse();
 
-        // 지금은 그냥 토큰을 출력한다
-        for (Token token : tokens) {
-            System.out.println(token);
+        // 구문 에러 발생 시 멈춘다
+        if (hadError) {
+            return;
         }
+
+        System.out.println(new AstPrinter().print(expression));
     }
 
     static void error(int line, String message) {
@@ -60,5 +69,13 @@ public class Lox {
     private static void report(int line, String where, String message) {
         System.err.println("[line " + line + "] Error" + where + ": " + message);
         hadError = true;
+    }
+
+    static void error(Token token, String message) {
+        if (token.type == TokenType.EOF) {
+            report(token.line, " at end", message);
+        } else {
+            report(token.line, " at '" + token.lexeme + "'", message);
+        }
     }
 }
