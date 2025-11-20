@@ -1,5 +1,5 @@
 ```
-expression      → equality
+expression      → equality ;
 equality        → comparison ( ( "!=" | "==" ) comparison )* ;
 comparsion      → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 term            → factor ( ( "-" | "+" ) factor )* ;
