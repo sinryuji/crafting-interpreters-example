@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GenerateAst {
+
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
             System.err.println("Usage: generate_ast <output directory>");
@@ -16,11 +17,13 @@ public class GenerateAst {
             "Binary     : Expr left, Token operator, Expr right",
             "Grouping   : Expr expression",
             "Literal    : Object value",
-            "Unary      : Token operator, Expr right"
+            "Unary      : Token operator, Expr right",
+            "Comma      : Expr left, Expr right"
         ));
     }
 
-    private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
+    private static void defineAst(String outputDir, String baseName, List<String> types)
+        throws IOException {
         String path = outputDir + "/" + baseName + ".java";
         PrintWriter writer = new PrintWriter(path, "UTF-8");
 
@@ -47,18 +50,21 @@ public class GenerateAst {
         writer.close();
     }
 
-    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) throws IOException {
+    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types)
+        throws IOException {
         writer.println("    interface Visitor<R> {");
 
         for (String type : types) {
             String typeName = type.split(":")[0].trim();
-            writer.println("        R visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
+            writer.println("        R visit" + typeName + baseName + "(" + typeName + " "
+                + baseName.toLowerCase() + ");");
         }
 
         writer.println("    }");
     }
 
-    private static void defineType(PrintWriter writer, String baseName, String className, String fieldList) {
+    private static void defineType(PrintWriter writer, String baseName, String className,
+        String fieldList) {
         writer.println("    static class " + className + " extends " + baseName + " {");
 
         // 생성자
@@ -82,7 +88,7 @@ public class GenerateAst {
 
         // 필드
         writer.println();
-        for (String field : fields){
+        for (String field : fields) {
             writer.println("        final " + field + ";");
         }
 
