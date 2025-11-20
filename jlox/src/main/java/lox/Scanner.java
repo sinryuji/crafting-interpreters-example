@@ -8,6 +8,7 @@ import java.util.Map;
 import static lox.TokenType.*;
 
 class Scanner {
+
     private final String source;
     private final List<Token> tokens = new ArrayList<>();
     private int start = 0;
@@ -54,16 +55,36 @@ class Scanner {
     private void scanToken() {
         char c = advance();
         switch (c) {
-            case '(': addToken(LEFT_PAREN); break;
-            case ')': addToken(RIGHT_PAREN); break;
-            case '{': addToken(LEFT_BRACE); break;
-            case '}': addToken(RIGHT_BRACE); break;
-            case ',': addToken(COMMA); break;
-            case '.': addToken(DOT); break;
-            case '-': addToken(MINUS); break;
-            case '+': addToken(PLUS); break;
-            case ';': addToken(SEMICOLON); break;
-            case '*': addToken(STAR); break;
+            case '(':
+                addToken(LEFT_PAREN);
+                break;
+            case ')':
+                addToken(RIGHT_PAREN);
+                break;
+            case '{':
+                addToken(LEFT_BRACE);
+                break;
+            case '}':
+                addToken(RIGHT_BRACE);
+                break;
+            case ',':
+                addToken(COMMA);
+                break;
+            case '.':
+                addToken(DOT);
+                break;
+            case '-':
+                addToken(MINUS);
+                break;
+            case '+':
+                addToken(PLUS);
+                break;
+            case ';':
+                addToken(SEMICOLON);
+                break;
+            case '*':
+                addToken(STAR);
+                break;
             case '!':
                 addToken(match('=') ? BANG_EQUAL : EQUAL);
                 break;
@@ -71,7 +92,7 @@ class Scanner {
                 addToken(match('=') ? EQUAL_EQUAL : EQUAL);
                 break;
             case '<':
-                addToken(match('=') ? LESS_EQUAL: LESS);
+                addToken(match('=') ? LESS_EQUAL : LESS);
                 break;
             case '>':
                 addToken(match('=') ? GREATER_EQUAL : GREATER);
@@ -79,7 +100,9 @@ class Scanner {
             case '/':
                 if (match('/')) {
                     // 주석은 줄 끝까지 이어진다
-                    while(peek() != '\n' && !isAtEnd()) advance();
+                    while (peek() != '\n' && !isAtEnd()) {
+                        advance();
+                    }
                 } else {
                     addToken(SLASH);
                 }
@@ -99,6 +122,14 @@ class Scanner {
                 string();
                 break;
 
+            case '?':
+                addToken(QUESTION);
+                break;
+
+            case ':':
+                addToken(COLON);
+                break;
+
             default:
                 if (isDigit(c)) {
                     number();
@@ -112,23 +143,31 @@ class Scanner {
     }
 
     private void identifier() {
-        while (isAlphaNumeric(peek())) advance();
+        while (isAlphaNumeric(peek())) {
+            advance();
+        }
 
         String text = source.substring(start, current);
         TokenType type = keywords.get(text);
-        if (type == null) type = IDENTIFIER;
+        if (type == null) {
+            type = IDENTIFIER;
+        }
         addToken(type);
     }
 
     private void number() {
-        while (isDigit(peek())) advance();
+        while (isDigit(peek())) {
+            advance();
+        }
 
         // 소수부를 피크한다
         if (peek() == '.' && isDigit(peekNext())) {
             // "."을 소비한다
             advance();
 
-            while (isDigit(peek())) advance();
+            while (isDigit(peek())) {
+                advance();
+            }
         }
 
         addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
@@ -136,7 +175,9 @@ class Scanner {
 
     private void string() {
         while (peek() != '"' && !isAtEnd()) {
-            if (peek() == '\n') line++;
+            if (peek() == '\n') {
+                line++;
+            }
             advance();
         }
 
@@ -154,8 +195,12 @@ class Scanner {
     }
 
     private boolean match(char expected) {
-        if (isAtEnd()) return false;
-        if (source.charAt(current) != expected) return false;
+        if (isAtEnd()) {
+            return false;
+        }
+        if (source.charAt(current) != expected) {
+            return false;
+        }
 
         current++;
 
@@ -163,12 +208,16 @@ class Scanner {
     }
 
     private char peek() {
-        if (isAtEnd()) return '\0';
+        if (isAtEnd()) {
+            return '\0';
+        }
         return source.charAt(current);
     }
 
     private char peekNext() {
-        if (current + 1 >= source.length()) return '\0';
+        if (current + 1 >= source.length()) {
+            return '\0';
+        }
         return source.charAt(current + 1);
     }
 
@@ -188,9 +237,10 @@ class Scanner {
         return current >= source.length();
     }
 
-    private char advance(){
+    private char advance() {
         return source.charAt(current++);
     }
+
     private void addToken(TokenType type) {
         addToken(type, null);
     }
